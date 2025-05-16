@@ -1,0 +1,5 @@
+# This file is a copy reference to mount the OpenAPI spec into FastAPI docs
+openapi: 3.1.0
+info:
+  title: KonvaJS Canvas API
+  version: "konva/v9.2.0"

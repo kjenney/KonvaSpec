@@ -1,0 +1,1 @@
+Use Swagger UI to render `openapi/konva-v9.2.0.yaml` and enable API interaction.
