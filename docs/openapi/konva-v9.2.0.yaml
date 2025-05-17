@@ -156,6 +156,107 @@ components:
             attrs: 
               type: object
 
+    Text:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Text
+        attrs:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+            text: { type: string }
+            fontSize: { type: number }
+            fontFamily: { type: string }
+            fill: { type: string }
+            align: { type: string }
+        x-konva-filters:
+          $ref: '#/components/schemas/FilterConfig'
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    Image:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Image
+        attrs:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+            width: { type: number }
+            height: { type: number }
+            src: { type: string }
+        x-konva-filters:
+          $ref: '#/components/schemas/FilterConfig'
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    Group:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Group
+        attrs:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/KonvaObject'
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    Line:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Line
+        attrs:
+          type: object
+          properties:
+            points: 
+              type: array
+              items:
+                type: number
+            stroke: { type: string }
+            strokeWidth: { type: number }
+            lineCap: { type: string }
+            lineJoin: { type: string }
+        x-konva-filters:
+          $ref: '#/components/schemas/FilterConfig'
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    Star:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Star
+        attrs:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+            numPoints: { type: integer }
+            innerRadius: { type: number }
+            outerRadius: { type: number }
+            fill: { type: string }
+            stroke: { type: string }
+        x-konva-filters:
+          $ref: '#/components/schemas/FilterConfig'
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
     EventListeners:
       type: object
       additionalProperties:
