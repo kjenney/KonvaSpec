@@ -18,7 +18,8 @@ You can interact with the server directly using curl:
 # Render a Konva canvas from a YAML file
 curl -X POST http://localhost:8000/canvas \
   -H "Content-Type: application/yaml" \
-  -d "$(cat examples/konva.yaml)"
+  -d "$(cat examples/konva.yaml)" \
+  | jq .jsCode
 
 # Health check endpoint
 curl http://localhost:8000/health
