@@ -1,0 +1,42 @@
+site_name: KonvaSpec API Documentation
+site_description: API documentation for KonvaJS Canvas API
+site_author: Sprite Cinema
+repo_url: https://github.com/kjenney/sprite-cinema/KonvaSpec
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - content.code.copy
+  custom_dir: docs/assets
+
+extra_css:
+  - assets/css/custom.css
+
+plugins:
+  - search
+  - swagger-ui-tag:
+      background: "white"
+      docExpansion: "list"
+      syntaxHighlightTheme: "monokai"
+      tryItOutEnabled: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+
+nav:
+  - Home: index.md
+  - API Guide: api-guide.md
+  - API Reference: swagger-ui.md

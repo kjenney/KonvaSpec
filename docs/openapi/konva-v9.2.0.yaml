@@ -1,0 +1,163 @@
+openapi: 3.1.0
+info:
+  title: KonvaJS Canvas API
+  version: "konva/v9.2.0"
+  description: >
+    An OpenAPI-compliant specification for defining KonvaJS scenes and components via YAML.
+    Supports full canvas hierarchy, animations, transitions, events, caching, filters, and more.
+
+servers:
+  - url: https://api.konvaservice.com/v9.2.0
+
+paths:
+  /canvas:
+    post:
+      summary: Create a new canvas with KonvaJS objects
+      requestBody:
+        required: true
+        content:
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Canvas'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsCode:
+                    type: string
+                    description: Renderable JavaScript output
+
+components:
+  schemas:
+    Canvas:
+      type: object
+      required: [stage, layers]
+      properties:
+        stage:
+          $ref: '#/components/schemas/Stage'
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+
+    Stage:
+      type: object
+      required: [container, width, height]
+      properties:
+        container:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+        x-konva-attrs:
+          type: object
+          description: Additional stage attributes
+
+    Layer:
+      type: object
+      required: [objects]
+      properties:
+        name:
+          type: string
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/KonvaObject'
+        x-konva-attrs:
+          type: object
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    KonvaObject:
+      oneOf:
+        - $ref: '#/components/schemas/Rect'
+        - $ref: '#/components/schemas/Circle'
+        - $ref: '#/components/schemas/Text'
+        - $ref: '#/components/schemas/Image'
+        - $ref: '#/components/schemas/Group'
+        - $ref: '#/components/schemas/Line'
+        - $ref: '#/components/schemas/Star'
+        - $ref: '#/components/schemas/Animation'
+        - $ref: '#/components/schemas/Transition'
+
+    Rect:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Rect
+        attrs:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+            width: { type: number }
+            height: { type: number }
+            fill: { type: string }
+        x-konva-filters:
+          $ref: '#/components/schemas/FilterConfig'
+        x-konva-cache: 
+          type: boolean
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    Circle:
+      type: object
+      required: [type]
+      properties:
+        type:
+          const: Circle
+        attrs:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+            radius: { type: number }
+            fill: { type: string }
+        x-konva-filters:
+          $ref: '#/components/schemas/FilterConfig'
+        x-konva-listeners:
+          $ref: '#/components/schemas/EventListeners'
+
+    FilterConfig:
+      type: array
+      items:
+        type: string
+        enum: [Blur, Brighten, Contrast, Emboss, Grayscale, Invert, Noise, Pixelate, Sepia, RGBA]
+
+    Animation:
+      type: object
+      required: [type, config]
+      properties:
+        type:
+          const: Animation
+        config:
+          type: object
+          properties:
+            node: { type: string }
+            callback: { type: string }
+
+    Transition:
+      type: object
+      required: [type, config]
+      properties:
+        type:
+          const: Transition
+        config:
+          type: object
+          properties:
+            duration: { type: number }
+            easing: { type: string }
+            attrs: 
+              type: object
+
+    EventListeners:
+      type: object
+      additionalProperties:
+        type: string
+        description: JavaScript handler code as a string (e.g. "function(evt) { console.log(evt); }")

@@ -1,0 +1,53 @@
+/* Custom styles for MkDocs with Swagger UI */
+
+/* Improve the Swagger UI iframe appearance */
+.swagger-ui-frame {
+  width: 100%;
+  height: 100vh;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Add some custom styling for the Material theme */
+:root {
+  --md-primary-fg-color: #2c3e50;
+  --md-primary-fg-color--light: #34495e;
+  --md-primary-fg-color--dark: #1a252f;
+  --md-accent-fg-color: #3498db;
+}
+
+/* Improve code block styling */
+.md-typeset pre > code {
+  border-radius: 4px;
+}
+
+/* Improve table styling */
+.md-typeset table:not([class]) {
+  font-size: 0.8rem;
+}
+
+/* Custom styling for admonitions */
+.md-typeset .admonition {
+  border-radius: 4px;
+}
+
+/* Custom styling for API endpoints */
+.api-endpoint {
+  background-color: #f8f9fa;
+  border-left: 4px solid var(--md-accent-fg-color);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.api-endpoint code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+}
+
+/* Custom footer styling */
+.md-footer-meta {
+  background-color: var(--md-primary-fg-color--dark);
+}
