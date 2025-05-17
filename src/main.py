@@ -92,11 +92,18 @@ async def delete_canvas(canvas_id: str = Path(..., description="The ID of the ca
         "data": deleted_data
     }
 
-# Optional: override OpenAPI schema
-@app.get("/openapi.json", include_in_schema=False)
-async def custom_openapi():
-    return get_openapi(
+# Override OpenAPI schema
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    
+    openapi_schema = get_openapi(
         title="KonvaJS Canvas API",
         version="konva/v9.2.0",
         routes=app.routes,
     )
+    
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
