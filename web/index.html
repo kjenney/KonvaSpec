@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KonvaSpec YAML Tester</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>KonvaSpec YAML Tester</h1>
+        
+        <div class="form-container">
+            <h2>Enter YAML Configuration</h2>
+            <textarea id="yamlInput" placeholder="Enter your YAML here...">type: stage
+width: 600
+height: 400
+children:
+  - type: layer
+    children:
+      - type: rect
+        x: 100
+        y: 100
+        width: 100
+        height: 100
+        fill: red
+        draggable: true</textarea>
+            <button id="submitYaml">Generate JavaScript</button>
+        </div>
+        
+        <div class="result-container">
+            <div class="js-container">
+                <h2>Generated JavaScript</h2>
+                <pre id="jsOutput">// JavaScript will appear here</pre>
+                <button id="injectJs">Inject JavaScript</button>
+            </div>
+            
+            <div class="preview-container">
+                <h2>Preview</h2>
+                <div id="canvasContainer"></div>
+            </div>
+        </div>
+        
+        <div class="status-container">
+            <h2>Status</h2>
+            <div id="statusMessage"></div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/konva@9.2.0/konva.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,11 +1,21 @@
 from fastapi import FastAPI, Request, HTTPException, Path
 from fastapi.responses import JSONResponse
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
 import yaml
 import uuid
 from typing import Dict, List, Any, Optional
 
 app = FastAPI()
+
+# Add CORS middleware to allow requests from the web client
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Allow requests from web client
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 # In-memory storage for canvas configurations
 # In a production app, this would be a database
