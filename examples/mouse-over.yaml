@@ -1,0 +1,151 @@
+stage:
+  width: 800
+  height: 600
+
+layers:
+  - name: animationLayer
+    # Add custom event listener to the layer for animation
+    x-konva-listeners:
+      # This will be called on each frame to animate all objects
+      click: |
+        function() {
+          // Start animations when the layer is clicked
+          var anim = new Konva.Animation(function(frame) {
+            // Animate circle in circular motion
+            var circle = stage.findOne('#movingCircle');
+            var amplitude = 100;
+            var period = 2000;
+            
+            // Calculate x position based on sine wave
+            var centerX = 200;
+            var x = centerX + amplitude * Math.sin(frame.time * 2 * Math.PI / period);
+            
+            // Calculate y position based on cosine wave
+            var centerY = 150;
+            var y = centerY + amplitude * Math.cos(frame.time * 2 * Math.PI / period);
+            
+            // Update the circle's position
+            circle.x(x);
+            circle.y(y);
+            
+            // Animate rectangle - pulsing effect
+            var rect = stage.findOne('#pulsingRect');
+            var scale = 1.0 + 0.3 * Math.sin(frame.time * 2 * Math.PI / 2000);
+            rect.scaleX(scale);
+            rect.scaleY(scale);
+            
+            // Animate star - rotation
+            var star = stage.findOne('#rotatingStar');
+            var angleDegrees = (frame.time * 120 / 1000) % 360;
+            star.rotation(angleDegrees);
+            
+            // Animate moving rectangle
+            var movingRect = stage.findOne('#movingRect');
+            var rectX = 100 + 500 * Math.abs(Math.sin(frame.time * Math.PI / 5000));
+            movingRect.x(rectX);
+            
+            // Change color based on position
+            var colorValue = Math.floor(255 * Math.abs(Math.sin(frame.time * Math.PI / 2500)));
+            var newColor = 'rgb(' + colorValue + ',' + (255 - colorValue) + ',85)';
+            movingRect.fill(newColor);
+          }, this.getLayer());
+          
+          // Start the animation
+          anim.start();
+        }
+    objects:
+      # Instructions text
+      - type: Text
+        attrs:
+          x: 400
+          y: 50
+          text: "Click anywhere to start animations"
+          fontSize: 20
+          fontFamily: "Arial"
+          fill: "black"
+          align: "center"
+          width: 400
+      
+      # A circle that will move in a circular path
+      - type: Circle
+        attrs:
+          x: 200
+          y: 150
+          radius: 30
+          fill: '#FF5555'
+          id: movingCircle
+        x-konva-listeners:
+          mouseover: |
+            function(evt) {
+              this.fill('#FF0000');
+              this.getLayer().draw();
+            }
+          mouseout: |
+            function(evt) {
+              this.fill('#FF5555');
+              this.getLayer().draw();
+            }
+      
+      # A rectangle that will grow and shrink
+      - type: Rect
+        attrs:
+          x: 300
+          y: 200
+          width: 100
+          height: 50
+          fill: '#5555FF'
+          id: pulsingRect
+        x-konva-listeners:
+          mouseover: |
+            function(evt) {
+              this.fill('#0000FF');
+              this.getLayer().draw();
+            }
+          mouseout: |
+            function(evt) {
+              this.fill('#5555FF');
+              this.getLayer().draw();
+            }
+      
+      # A star that will rotate
+      - type: Star
+        attrs:
+          x: 500
+          y: 300
+          numPoints: 5
+          innerRadius: 20
+          outerRadius: 40
+          fill: '#55FF55'
+          id: rotatingStar
+        x-konva-listeners:
+          mouseover: |
+            function(evt) {
+              this.fill('#00FF00');
+              this.getLayer().draw();
+            }
+          mouseout: |
+            function(evt) {
+              this.fill('#55FF55');
+              this.getLayer().draw();
+            }
+      
+      # A rectangle that moves horizontally
+      - type: Rect
+        attrs:
+          x: 100
+          y: 400
+          width: 80
+          height: 40
+          fill: '#FFAA55'
+          id: movingRect
+        x-konva-listeners:
+          mouseover: |
+            function(evt) {
+              this.fill('#FFFF00');
+              this.getLayer().draw();
+            }
+          mouseout: |
+            function(evt) {
+              this.fill('#FFAA55');
+              this.getLayer().draw();
+            }
