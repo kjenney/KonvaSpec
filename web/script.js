@@ -76,62 +76,64 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatus('No JavaScript to inject', 'error');
             return;
         }
-        
+
         try {
             // Clean up any previously injected script
             if (injectedScript && injectedScript.parentNode) {
                 injectedScript.parentNode.removeChild(injectedScript);
                 injectedScript = null;
             }
-            
-            // Clean up any Konva stages that might exist
-            // This is important as Konva can leave event listeners and other resources
+
+            // Destroy previous Konva stages
             if (window.Konva) {
                 const stages = window.Konva.stages;
                 if (stages && stages.length > 0) {
-                    // Make a copy of the array since destroy() modifies the original array
                     [...stages].forEach(stage => stage.destroy());
                 }
             }
-            
-            // Clear previous canvas
+
             clearCanvas();
-            
-            // Create a container for the Konva stage
+
             const stageContainer = document.createElement('div');
             stageContainer.id = 'konva-container';
             canvasContainer.appendChild(stageContainer);
-            
-            // For debugging
-            console.log('Injecting JavaScript:', jsOutput.textContent);
-            
-            // Use eval in a controlled way to execute the code
-            // First create a function that will execute in the global scope
-            const executeCode = new Function(`
+
+            function runInjectedScript() {
+                console.log('Executing injected JavaScript...');
+                const container = document.getElementById('konva-container');
                 try {
-                    // Create a safe execution context
-                    (function() {
-                        // Make sure the container is available to the code
-                        const container = document.getElementById('konva-container');
-                        
-                        // Execute the code
-                        ${jsOutput.textContent}
-                    })();
-                    return true;
-                } catch (error) {
-                    console.error('Error executing injected JavaScript:', error);
-                    document.getElementById('statusMessage').textContent = 'Error executing JavaScript: ' + error.message;
-                    document.getElementById('statusMessage').className = 'error';
-                    return false;
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.textContent = `
+                        (function() {
+                            const container = document.getElementById('konva-container');
+                            ${jsOutput.textContent}
+                        })();
+                    `;
+                    document.body.appendChild(script);
+                    injectedScript = script;
+                    updateStatus('JavaScript injected and executed successfully!', 'success');
+                } catch (err) {
+                    console.error('Error executing JavaScript:', err);
+                    updateStatus('Error executing JavaScript: ' + err.message, 'error');
                 }
-            `);
-            
-            // Execute the code
-            const success = executeCode();
-            
-            if (success) {
-                updateStatus('JavaScript injected and executed successfully!', 'success');
             }
+
+            function ensureKonvaLoaded(callback) {
+                if (window.Konva) {
+                    callback();
+                } else {
+                    const konvaScript = document.createElement('script');
+                    konvaScript.src = 'https://unpkg.com/konva@9/konva.min.js';
+                    konvaScript.onload = callback;
+                    konvaScript.onerror = () => updateStatus('Failed to load KonvaJS', 'error');
+                    document.head.appendChild(konvaScript);
+                }
+            }
+
+            console.log('Preparing to inject JavaScript...');
+            ensureKonvaLoaded(runInjectedScript);
+
         } catch (error) {
             console.error('Error injecting JavaScript:', error);
             updateStatus('Error injecting JavaScript: ' + error.message, 'error');

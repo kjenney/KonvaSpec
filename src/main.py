@@ -4,6 +4,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 import yaml
 import uuid
+import json
 from typing import Dict, List, Any, Optional
 
 app = FastAPI()
@@ -30,8 +31,8 @@ async def create_canvas(request: Request):
         canvas_id = str(uuid.uuid4())
         canvases[canvas_id] = data
         
-        # Simulate conversion to JS (actual logic omitted for brevity)
-        js_code = f"// JS output for: {data}"
+        # Generate actual executable JavaScript for Konva.js
+        js_code = generate_konva_js(data)
         
         return {
             "id": canvas_id,
@@ -77,8 +78,8 @@ async def update_canvas(
         data = yaml.safe_load(yaml_body)
         canvases[canvas_id] = data
         
-        # Simulate conversion to JS
-        js_code = f"// JS output for updated canvas: {data}"
+        # Generate actual executable JavaScript for Konva.js
+        js_code = generate_konva_js(data)
         
         return {
             "id": canvas_id,
@@ -117,6 +118,75 @@ def custom_openapi():
     return app.openapi_schema
 
 app.openapi = custom_openapi
+
+def generate_konva_js(data):
+    """Generate executable JavaScript code for Konva.js based on YAML configuration."""
+    js_code = []
+    
+    # Extract stage configuration
+    stage_config = data.get('stage', {})
+    # Always use 'konva-container' as that's what the web client creates
+    container_id = 'konva-container'
+    width = stage_config.get('width', 800)
+    height = stage_config.get('height', 600)
+    
+    # Create stage initialization code
+    js_code.append("// Create a new Konva stage")
+    js_code.append("const stage = new Konva.Stage({")
+    js_code.append(f"  container: '{container_id}',")
+    js_code.append(f"  width: {width},")
+    js_code.append(f"  height: {height}")
+    js_code.append("});")
+    
+    # Process layers
+    js_code.append("// Create and add layers")
+    layers = data.get('layers', [])
+    for i, layer in enumerate(layers):
+        layer_name = layer.get('name', f"layer{i}")
+        layer_var = f"layer{i}"
+        js_code.append(f"// Create layer: {layer_name}")
+        js_code.append(f"const {layer_var} = new Konva.Layer();")
+        
+        # Process objects in the layer
+        objects = layer.get('objects', [])
+        for j, obj in enumerate(objects):
+            obj_type = obj.get('type')
+            obj_var = f"obj{i}_{j}"
+            
+            # Create object with attributes
+            attrs = obj.get('attrs', {})
+            attrs_json = json.dumps(attrs)
+            js_code.append(f"const {obj_var} = new Konva.{obj_type}({attrs_json});")
+            
+            # Add event listeners if specified
+            listeners = obj.get('x-konva-listeners', {})
+            for event, handler in listeners.items():
+                js_code.append(f"{obj_var}.on('{event}', {handler});")
+            
+            # Add filters if specified
+            filters = obj.get('x-konva-filters', [])
+            for filter_name in filters:
+                js_code.append(f"{obj_var}.filters([Konva.Filters.{filter_name}]);")
+            
+            # Set cache option if specified
+            if 'x-konva-cache' in obj and obj['x-konva-cache']:
+                js_code.append(f"{obj_var}.cache();")
+            
+            # Add object to layer
+            js_code.append(f"{layer_var}.add({obj_var});")
+        
+        # Add layer to stage
+        js_code.append("// Add layer to stage")
+        js_code.append(f"stage.add({layer_var});")
+    
+    # Draw the stage
+    js_code.append("// Draw the stage")
+    js_code.append("stage.draw();")
+    
+    # Log to console for debugging
+    js_code.append("console.log('Konva stage created with ' + stage.getLayers().length + ' layers');")
+    
+    return "\n".join(js_code)
 
 @app.get("/health")
 async def health_check():
