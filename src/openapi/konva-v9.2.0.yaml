@@ -60,7 +60,7 @@ components:
 
     Layer:
       type: object
-      required: [objects]
+      required: [objects] # 'animations' is optional
       properties:
         name:
           type: string
@@ -68,10 +68,48 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/KonvaObject'
+        animations: # <-- New property
+          type: array
+          items:
+            $ref: '#/components/schemas/LayerAnimation' # Reference the new schema
+          description: A list of animations to apply to objects within this layer.
         x-konva-attrs:
           type: object
         x-konva-listeners:
           $ref: '#/components/schemas/EventListeners'
+
+    LayerAnimation: # <-- New schema component
+      type: object
+      properties:
+        targetName:
+          type: string
+          description: The 'name' attribute of the Konva object to animate within the same layer.
+        tween:
+          type: object
+          description: Konva.Tween properties.
+          properties:
+            duration:
+              type: number
+              description: Duration of the tween in seconds.
+            easing:
+              type: string
+              description: Optional easing function (e.g., 'Linear', 'EaseInOut', 'StrongEaseOut'). Maps to Konva.Easings.
+            # Allow any other properties for the tween (x, y, fill, opacity, scaleX, scaleY, rotation etc.)
+            # These are dynamic based on what the user wants to animate.
+          required:
+            - duration
+          additionalProperties: true # Allows for dynamic tween properties like x, y, opacity, etc.
+        autoplay:
+          type: boolean
+          default: true
+          description: Whether the animation should play automatically.
+        loop:
+          type: boolean
+          default: false
+          description: Whether the animation should loop.
+      required:
+        - targetName
+        - tween
 
     KonvaObject:
       oneOf:

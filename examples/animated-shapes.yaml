@@ -1,0 +1,63 @@
+stage:
+  container: 'konva-container'
+  width: 800
+  height: 600
+
+layers:
+  - name: 'shapes-animation-layer'
+    objects:
+      - type: Rect
+        attrs:
+          name: 'animatedRect'
+          x: 50
+          y: 100
+          width: 100
+          height: 70
+          fill: 'seagreen'
+          stroke: 'black'
+          strokeWidth: 2
+          draggable: true # Added for interactivity
+      - type: Circle
+        attrs:
+          name: 'animatedCircle'
+          x: 150
+          y: 300
+          radius: 40
+          fill: 'crimson'
+          opacity: 1
+          draggable: true
+    animations:
+      - targetName: 'animatedRect'
+        tween:
+          duration: 2.5 # seconds
+          x: 650
+          rotation: 360
+          fill: 'skyblue'
+          scaleX: 1.5
+          scaleY: 1.5
+        easing: 'EaseInOut'
+        loop: true
+      - targetName: 'animatedCircle'
+        tween:
+          duration: 3
+          y: 100
+          opacity: 0.3
+          radius: 60
+        easing: 'StrongEaseOut'
+        autoplay: true # Default is true, but explicitly showing
+        loop: false # Default is false
+      # Example of a tween that might start on an event in a real app
+      # For now, if autoplay is false, it just won't play unless triggered by other means (not supported by current backend)
+      - targetName: 'animatedCircle' # Targeting the same circle with a different animation
+        tween:
+          duration: 1
+          x: 500
+          fill: 'gold'
+        easing: 'Linear'
+        autoplay: false # This animation won't play on load
+        # loop: false (default)
+        # This demonstrates that multiple tweens can be defined for the same object,
+        # though their simultaneous playback control is up to the JS environment.
+        # Our current backend simply creates and optionally autoplays them.
+        # For a real scenario, one might not autoplay and trigger it via an event.
+```

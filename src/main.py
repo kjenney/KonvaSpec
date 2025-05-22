@@ -174,6 +174,60 @@ def generate_konva_js(data):
             
             # Add object to layer
             js_code.append(f"{layer_var}.add({obj_var});")
+
+        # Process animations in the layer
+        animations = layer.get('animations', [])
+        if animations:
+            js_code.append(f"// Animations for layer: {layer_name}")
+            for anim_idx, anim_config in enumerate(animations):
+                target_name = anim_config.get('targetName')
+                tween_config = anim_config.get('tween', {})
+                autoplay = anim_config.get('autoplay', True)
+                loop = anim_config.get('loop', False)
+
+                if not target_name:
+                    js_code.append(f"// Animation {anim_idx} skipped: targetName is missing")
+                    continue
+
+                tween_var = f"tween_{i}_{anim_idx}"
+                js_code.append(f"// Create tween for target: {target_name}")
+                
+                tween_props_js = []
+                tween_props_js.append(f"node: {layer_var}.findOne('.{target_name}')")
+
+                for key, value in tween_config.items():
+                    if key == 'easing':
+                        easing_map = {
+                            'Linear': 'Konva.Easings.Linear',
+                            'EaseIn': 'Konva.Easings.EaseIn',
+                            'EaseOut': 'Konva.Easings.EaseOut',
+                            'EaseInOut': 'Konva.Easings.EaseInOut',
+                            'StrongEaseIn': 'Konva.Easings.StrongEaseIn',
+                            'StrongEaseOut': 'Konva.Easings.StrongEaseOut',
+                            # Add more easings as needed
+                        }
+                        if value in easing_map:
+                            tween_props_js.append(f"easing: {easing_map[value]}")
+                        else:
+                            # Omit or use a default if not recognized
+                            js_code.append(f"// Warning: Easing '{value}' not recognized for animation {anim_idx}")
+                    elif isinstance(value, (str)):
+                        tween_props_js.append(f"{key}: '{value}'")
+                    else:
+                        tween_props_js.append(f"{key}: {json.dumps(value)}") # Use json.dumps for numbers/booleans
+
+                if loop:
+                    tween_props_js.append(f"""onFinish: function() {{
+    {tween_var}.reset();
+    {tween_var}.play();
+  }}""")
+
+                js_code.append(f"const {tween_var} = new Konva.Tween({{")
+                js_code.append(",\n  ".join(tween_props_js))
+                js_code.append("});")
+
+                if autoplay:
+                    js_code.append(f"{tween_var}.play();")
         
         # Add layer to stage
         js_code.append("// Add layer to stage")
